@@ -1,26 +1,26 @@
-# AI-Shell: Your Intelligent Command-Line Companion
+# Shell-AI: Your Intelligent Command-Line Companion
 
-AI-Shell (`ais`) is a CLI utility that brings the power of natural language understanding to your command line. Simply input what you want to do in natural language, and `ais` will suggest single-line commands that achieve your intent. Under the hood, AI-Shell leverages the [LangChain](https://github.com/langchain-ai/langchain) for LLM use and builds on the excellent [InquirerPy](https://github.com/kazhala/InquirerPy) for the interactive CLI.
+Shell-AI (`shai`) is a CLI utility that brings the power of natural language understanding to your command line. Simply input what you want to do in natural language, and `shai` will suggest single-line commands that achieve your intent. Under the hood, Shell-AI leverages the [LangChain](https://github.com/langchain-ai/langchain) for LLM use and builds on the excellent [InquirerPy](https://github.com/kazhala/InquirerPy) for the interactive CLI.
 
 ## Installation
 
-You can install AI-Shell directly from PyPI using pip:
+You can install Shell-AI directly from PyPI using pip:
 
 ```bash
-pip install ai-shell
+pip install shell-ai
 ```
 
-After installation, you can invoke the utility using the `ais` command.
+After installation, you can invoke the utility using the `shai` command.
 
 ## Usage
 
-To use AI-Shell, open your terminal and type:
+To use Shell-AI, open your terminal and type:
 
 ```bash
-ais run terraform dry run thingy
+shai run terraform dry run thingy
 ```
 
-AI-Shell will then suggest 3 commands to fulfill your request:
+Shell-AI will then suggest 3 commands to fulfill your request:
 - `terraform plan`
 - `terraform plan -input=false`
 - `terraform plan`
@@ -39,4 +39,4 @@ Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) fo
 
 ## License
 
-AI-Shell is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Shell-AI is licensed under the MIT License. See [LICENSE](LICENSE) for details.

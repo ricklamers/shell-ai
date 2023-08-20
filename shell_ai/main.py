@@ -60,7 +60,7 @@ def main():
                 print(f"Error executing command: {e}")
                 break
     else:
-        print("Describe what you want to do as a single sentence. `ais <sentence>`")
+        print("Describe what you want to do as a single sentence. `shai <sentence>`")
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setup(
-    name='ai-shell',
+    name='shell-ai',
     version='0.1.0',
     author='Rick Lamers',
     packages=find_packages(),
@@ -15,7 +15,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'ais=ai_shell.main:main',
+            'shai=ai_shell.main:main',
         ],
     },
 )
