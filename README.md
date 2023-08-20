@@ -2,12 +2,6 @@
 
 AI-Shell (`ais`) is a CLI utility that brings the power of natural language understanding to your command line. Simply input what you want to do in natural language, and `ais` will suggest single-line commands that achieve your intent. Under the hood, AI-Shell leverages the [LangChain](https://github.com/langchain-ai/langchain) for LLM use and builds on the excellent [InquirerPy](https://github.com/kazhala/InquirerPy) for the interactive CLI.
 
-## Features
-
-- **Natural Language Input**: Describe what you want to do in plain English (or other supported languages).
-- **Command Suggestions**: Get single-line command suggestions that accomplish what you asked for.
-- **Cross-Platform**: Works on Linux, macOS, and Windows.
-
 ## Installation
 
 You can install AI-Shell directly from PyPI using pip:
@@ -30,6 +24,12 @@ AI-Shell will then suggest 3 commands to fulfill your request:
 - `terraform plan`
 - `terraform plan -input=false`
 - `terraform plan`
+
+## Features
+
+- **Natural Language Input**: Describe what you want to do in plain English (or other supported languages).
+- **Command Suggestions**: Get single-line command suggestions that accomplish what you asked for.
+- **Cross-Platform**: Works on Linux, macOS, and Windows.
 
 ## Contributing
 
