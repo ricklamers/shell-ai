@@ -1,3 +1,5 @@
+all: clean build publish
+
 build:
 	python setup.py sdist bdist_wheel
 
@@ -7,6 +9,4 @@ clean:
 publish: build
 	twine upload dist/*
 
-all: clean build publish
-
-.PHONY: build clean publish
+.PHONY: build clean publish all
