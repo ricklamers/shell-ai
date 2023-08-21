@@ -15,7 +15,7 @@ def main():
 
         Allowed envionment variables:
         - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
-        - AIS_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
+        - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
 
     """
 
@@ -30,10 +30,10 @@ def main():
         sys.exit(1)
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
-    AIS_SUGGESTION_COUNT = int(os.environ.get("AIS_SUGGESTION_COUNT", 3))
+    SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", 3))
     # End loading configuration
 
-    chat = ChatOpenAI(model_name=OPENAI_MODEL, n=AIS_SUGGESTION_COUNT)
+    chat = ChatOpenAI(model_name=OPENAI_MODEL, n=SHAI_SUGGESTION_COUNT)
     system_message = SystemMessage(content=
         """You are an expert at using shell commands. Only provide a single executable line of shell code as output. Never output any text before or after the shell code, as the output will be directly executed in a shell. You're allowed to chain commands like `ls | grep .txt`."""
     )

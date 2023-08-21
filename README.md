@@ -41,7 +41,7 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 ### Optional Variables
 
 1. **`OPENAI_MODEL`**: Defaults to `gpt-3.5-turbo`. You can set it to another OpenAI model if desired.
-2. **`AIS_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
+2. **`SHAI_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
 
 ### Configuration File
 
@@ -56,7 +56,7 @@ Example `config.json`:
 {
   "OPENAI_API_KEY": "your_openai_api_key_here",
   "OPENAI_MODEL": "gpt-3.5-turbo",
-  "AIS_SUGGESTION_COUNT": 3
+  "SHAI_SUGGESTION_COUNT": 3
 }
 ```
 
