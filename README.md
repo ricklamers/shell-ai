@@ -62,7 +62,7 @@ Example `config.json`:
 {
   "OPENAI_API_KEY": "your_openai_api_key_here",
   "OPENAI_MODEL": "gpt-3.5-turbo",
-  "SHAI_SUGGESTION_COUNT": 3
+  "SHAI_SUGGESTION_COUNT": "3"
 }
 ```
 
