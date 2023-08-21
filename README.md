@@ -33,6 +33,38 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 - **Command Suggestions**: Get single-line command suggestions that accomplish what you asked for.
 - **Cross-Platform**: Works on Linux, macOS, and Windows.
 
+## Configuration
+### Environment Variables
+
+1. **`OPENAI_API_KEY`**: Required. Set this environment variable to your OpenAI API key. You can find it on your [OpenAI Dashboard](https://beta.openai.com/account/api-keys).
+
+### Optional Variables
+
+1. **`OPENAI_MODEL`**: Defaults to `gpt-3.5-turbo`. You can set it to another OpenAI model if desired.
+2. **`AIS_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
+
+### Configuration File
+
+Alternatively, you can store these variables in a JSON configuration file:
+
+- For Linux/macOS: Create a file called `config.json` under `~/.config/shell-ai/`
+- For Windows: Create a file called `config.json` under `%APPDATA%\shell-ai\`
+
+Example `config.json`:
+
+```json
+{
+  "OPENAI_API_KEY": "your_openai_api_key_here",
+  "OPENAI_MODEL": "gpt-3.5-turbo",
+  "AIS_SUGGESTION_COUNT": 3
+}
+```
+
+The application will read from this file if it exists, overriding any existing environment variables.
+
+Run the application after setting these configurations.
+
+
 ## Contributing
 
 This implementation can be made much smarter! Contribute your ideas as Pull Requests and make AI Shell better for everyone.

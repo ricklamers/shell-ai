@@ -6,6 +6,8 @@ from InquirerPy.base.control import Choice
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 
+from shell_ai.config import load_config
+
 def main():
     """
         Required environment variables:
@@ -16,6 +18,12 @@ def main():
         - AIS_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
 
     """
+
+    # Load env configuration
+    loaded_config = load_config()
+    # Load keys of the configuration into environment variables
+    for key, value in loaded_config.items():
+        os.environ[key] = value
     
     if os.environ.get("OPENAI_API_KEY") is None:
         print("Please set the OPENAI_API_KEY environment variable to your OpenAI API key.")
@@ -23,6 +31,7 @@ def main():
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
     AIS_SUGGESTION_COUNT = int(os.environ.get("AIS_SUGGESTION_COUNT", 3))
+    # End loading configuration
 
     chat = ChatOpenAI(model_name=OPENAI_MODEL, n=AIS_SUGGESTION_COUNT)
     system_message = SystemMessage(content=

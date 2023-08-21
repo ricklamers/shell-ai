@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='shell-ai',
-    version='0.1.0',
+    version='0.3.0',
     author='Rick Lamers',
     packages=find_packages(),
     install_requires=requirements,
@@ -15,7 +15,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'shai=ai_shell.main:main',
+            'shai=shell_ai.main:main',
         ],
     },
 )
