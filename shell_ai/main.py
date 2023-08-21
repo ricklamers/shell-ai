@@ -49,7 +49,7 @@ def main():
 
         while True:
             options = get_suggestions(prompt)
-            options.append("Generate a new suggestion")
+            options.append("Generate new suggestions")
             options.append("Dismiss")
             choices = [Choice(value=option, name=option) for option in options]
             
