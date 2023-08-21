@@ -31,7 +31,7 @@ def main():
     loaded_config = load_config()
     # Load keys of the configuration into environment variables
     for key, value in loaded_config.items():
-        os.environ[key] = value
+        os.environ[key] = str(value)
 
     if os.environ.get("OPENAI_API_KEY") is None:
         print(
