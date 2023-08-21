@@ -1,5 +1,11 @@
 # Shell-AI: Your Intelligent Command-Line Companion
 
+[![PyPI version](https://badge.fury.io/py/shell-ai.svg)](https://pypi.org/project/shell-ai/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Forks](https://img.shields.io/github/forks/ricklamers/shell-ai)](https://github.com/ricklamers/shell-ai/network)
+[![Stars](https://img.shields.io/github/stars/ricklamers/shell-ai)](https://github.com/ricklamers/shell-ai/stargazers)
+
+
 Shell-AI (`shai`) is a CLI utility that brings the power of natural language understanding to your command line. Simply input what you want to do in natural language, and `shai` will suggest single-line commands that achieve your intent. Under the hood, Shell-AI leverages the [LangChain](https://github.com/langchain-ai/langchain) for LLM use and builds on the excellent [InquirerPy](https://github.com/kazhala/InquirerPy) for the interactive CLI.
 
 ![demo-shell-ai](https://github.com/ricklamers/shell-ai/assets/1309307/b4057165-5c23-46d4-b68e-00915b738dc3)
