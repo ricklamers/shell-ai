@@ -48,6 +48,7 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 
 1. **`OPENAI_MODEL`**: Defaults to `gpt-3.5-turbo`. You can set it to another OpenAI model if desired.
 2. **`SHAI_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
+3. **`OPENAI_API_BASE`**: Defaults to `https://api.openai.com/v1`. You can set it to specify the proxy or service emulator.
 
 ### Configuration File
 
