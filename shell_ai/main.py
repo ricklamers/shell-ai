@@ -28,6 +28,7 @@ def main():
     
     if os.environ.get("OPENAI_API_KEY") is None:
         print("Please set the OPENAI_API_KEY environment variable to your OpenAI API key.")
+        print("You can also create `config.json` under `~/.config/shell-ai/` to set the API key, see README.md for more information.")
         sys.exit(1)
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
