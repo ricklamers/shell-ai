@@ -53,7 +53,7 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 
 Alternatively, you can store these variables in a JSON configuration file:
 
-- For Linux/macOS: Create a file called `config.json` under `~/.config/shell-ai/`
+- For Linux/macOS: Create a file called `config.json` under `~/.config/shell-ai/` and secure it with `chmod 600 ~/.config/shell-ai/config.json`.
 - For Windows: Create a file called `config.json` under `%APPDATA%\shell-ai\`
 
 Example `config.json`:
