@@ -7,4 +7,6 @@ clean:
 publish: build
 	twine upload dist/*
 
+all: clean build publish
+
 .PHONY: build clean publish
