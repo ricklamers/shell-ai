@@ -44,6 +44,8 @@ def main():
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
+    OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
+    OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
     SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", 3))
     # End loading configuration
 
@@ -51,6 +53,8 @@ def main():
         model_name=OPENAI_MODEL,
         n=SHAI_SUGGESTION_COUNT,
         openai_api_base=OPENAI_API_BASE,
+        openai_organization=OPENAI_ORGANIZATION,
+        openai_proxy=OPENAI_PROXY,
     )
     system_message = SystemMessage(
         content="""You are an expert at using shell commands. Only provide a single executable line of shell code as output. Never output any text before or after the shell code, as the output will be directly executed in a shell. You're allowed to chain commands like `ls | grep .txt`."""
