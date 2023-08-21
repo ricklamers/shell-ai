@@ -10,7 +10,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setup(
     name='shell-ai',
-    version='0.3.3',
+    version='0.3.4',
     author='Rick Lamers',
     long_description=long_description,
     long_description_content_type='text/markdown',

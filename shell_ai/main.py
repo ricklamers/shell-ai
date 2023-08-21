@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+from enum import Enum
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from langchain.chat_models import ChatOpenAI
@@ -47,10 +48,15 @@ def main():
 
     if prompt:
 
+        class SelectSystemOptions(Enum):
+            OPT_GEN_SUGGESTIONS = "Generate new suggestions"
+            OPT_DISMISS = "Dismiss"
+
+        
         while True:
             options = get_suggestions(prompt)
-            options.append("Generate new suggestions")
-            options.append("Dismiss")
+            options.append(SelectSystemOptions.OPT_GEN_SUGGESTIONS.value)
+            options.append(SelectSystemOptions.OPT_DISMISS.value)
             choices = [Choice(value=option, name=option) for option in options]
             
             selection = inquirer.select(
@@ -59,9 +65,9 @@ def main():
             ).execute()
         
             try:
-                if selection == "Dismiss":
+                if selection == SelectSystemOptions.OPT_DISMISS.value:
                     sys.exit(0)
-                elif selection == "Generate a new suggestion":
+                elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
                     continue
                 subprocess.run(selection, shell=True, check=True)
                 break
