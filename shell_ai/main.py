@@ -93,6 +93,7 @@ def main():
         )
     if OPENAI_API_TYPE == "azure":
         chat = AzureChatOpenAI(
+            n=SHAI_SUGGESTION_COUNT,
             openai_api_base=AZURE_API_BASE,
             openai_api_version=OPENAI_API_VERSION,
             deployment_name=AZURE_DEPLOYMENT_NAME,
