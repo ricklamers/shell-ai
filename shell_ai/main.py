@@ -75,7 +75,7 @@ def main():
             "Please set the AZURE_DEPLOYMENT_NAME environment variable to your Azure deployment name."
         )
         sys.exit(1)
-    if AZURE_API_BASE is None:
+    if OPENAI_API_TYPE == "azure" and AZURE_API_BASE is None:
         print(
             "Please set the AZURE_API_BASE environment variable to your Azure API base."
         )
