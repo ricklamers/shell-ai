@@ -38,6 +38,7 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 - **Natural Language Input**: Describe what you want to do in plain English (or other supported languages).
 - **Command Suggestions**: Get single-line command suggestions that accomplish what you asked for.
 - **Cross-Platform**: Works on Linux, macOS, and Windows.
+- **Azure Compatibility**: Shell-AI now supports Azure OpenAI deployments.
 
 ## Configuration
 ### Environment Variables
@@ -51,6 +52,9 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 3. **`OPENAI_API_BASE`**: Defaults to `https://api.openai.com/v1`. You can set it to specify the proxy or service emulator.
 4. **`OPENAI_ORGANIZATION`**: OpenAI Organization ID
 5. **`OPENAI_PROXY`**: OpenAI proxy
+6. **`OPENAI_API_TYPE`**: Set to "azure" if you are using Azure deployments.
+7. **`AZURE_DEPLOYMENT_NAME`**: Your Azure deployment name (required if using Azure).
+8. **`AZURE_API_BASE`**: Your Azure API base (required if using Azure).
 
 ### Configuration File
 
