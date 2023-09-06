@@ -148,7 +148,10 @@ def main():
                     sys.exit(0)
                 elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
                     continue
-                subprocess.run(selection, shell=True, check=True)
+                user_command = inquirer.text(
+                    message="Confirm:", default=selection
+                ).execute()
+                subprocess.run(user_command, shell=True, check=True)
                 break
             except subprocess.CalledProcessError as e:
                 print(f"Error executing command: {e}")
