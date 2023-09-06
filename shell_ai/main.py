@@ -167,6 +167,8 @@ def main():
                     user_command = inquirer.text(
                         message="Confirm:", default=selection
                     ).execute()
+                else:
+                    user_command = selection
                 subprocess.run(user_command, shell=True, check=True)
                 break
             except subprocess.CalledProcessError as e:
