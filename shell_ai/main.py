@@ -11,7 +11,7 @@ from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 
 from shell_ai.config import load_config
-
+from shell_ai.code_parser import code_parser
 
 class SelectSystemOptions(Enum):
     OPT_GEN_SUGGESTIONS = "Generate new suggestions"
@@ -105,7 +105,7 @@ def main():
         )
 
     system_message = SystemMessage(
-        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with `{"command": "echo 'Hello, World!'"}`."""
+        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```"""
     )
 
     def get_suggestions(prompt):
@@ -122,12 +122,14 @@ def main():
         commands = []
         for msg in response.generations[0]:
             try:
-                command_json = json.loads(msg.message.content)
+                json_content = code_parser(msg.message.content)
+                command_json = json.loads(json_content)
                 command = command_json.get("command", "")
                 if command:  # Ensure the command is not empty
                     commands.append(command)
             except json.JSONDecodeError:
-                print("There was an error processing a command suggestion. Please try again.")
+                # Fallback: treat the message as a command
+                commands.append(msg.message.content)
 
 
         return commands
