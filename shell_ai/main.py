@@ -3,6 +3,7 @@ import subprocess
 import sys
 import textwrap
 from enum import Enum
+import json
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
@@ -103,7 +104,7 @@ def main():
         )
 
     system_message = SystemMessage(
-        content="""You are an expert at using shell commands. Only provide a single executable line of shell code as output. Never output any text before or after the shell code, as the output will be directly executed in a shell. You're allowed to chain commands like `ls | grep .txt`."""
+        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with `{"command": "echo 'Hello, World!'"}`."""
     )
 
     def get_suggestions(prompt):
@@ -115,7 +116,20 @@ def main():
                 ]
             ]
         )
-        return [msgs.message.content for msgs in response.generations[0]]
+        
+        # Extract commands from the JSON response
+        commands = []
+        for msg in response.generations[0]:
+            try:
+                command_json = json.loads(msg.message.content)
+                command = command_json.get("command", "")
+                if command:  # Ensure the command is not empty
+                    commands.append(command)
+            except json.JSONDecodeError:
+                print("There was an error processing a command suggestion. Please try again.")
+
+
+        return commands
 
     # Consume all arguments after the script name as a single sentence
     prompt = " ".join(sys.argv[1:])
