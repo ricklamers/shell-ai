@@ -31,6 +31,7 @@ def main():
     Allowed envionment variables:
     - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
     - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
+    - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
 
     Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
@@ -162,9 +163,10 @@ def main():
                     sys.exit(0)
                 elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
                     continue
-                user_command = inquirer.text(
-                    message="Confirm:", default=selection
-                ).execute()
+                if os.environ.get("SHAI_SKIP_CONFIRM") != "true":
+                    user_command = inquirer.text(
+                        message="Confirm:", default=selection
+                    ).execute()
                 subprocess.run(user_command, shell=True, check=True)
                 break
             except subprocess.CalledProcessError as e:
