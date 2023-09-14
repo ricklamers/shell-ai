@@ -155,27 +155,30 @@ def main():
                 )
                 for option in options
             ]
-
-            selection = inquirer.select(
-                message="Select a command:", choices=choices
-            ).execute()
-
             try:
-                if selection == SelectSystemOptions.OPT_DISMISS.value:
-                    sys.exit(0)
-                elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
-                    continue
-                if os.environ.get("SHAI_SKIP_CONFIRM") != "true":
-                    user_command = inquirer.text(
-                        message="Confirm:", default=selection
-                    ).execute()
-                else:
-                    user_command = selection
-                subprocess.run(user_command, shell=True, check=True)
-                break
-            except subprocess.CalledProcessError as e:
-                print(f"Error executing command: {e}")
-                break
+                selection = inquirer.select(
+                    message="Select a command:", choices=choices
+                ).execute()
+
+                try:
+                    if selection == SelectSystemOptions.OPT_DISMISS.value:
+                        sys.exit(0)
+                    elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
+                        continue
+                    if os.environ.get("SHAI_SKIP_CONFIRM") != "true":
+                        user_command = inquirer.text(
+                            message="Confirm:", default=selection
+                        ).execute()
+                    else:
+                        user_command = selection
+                    subprocess.run(user_command, shell=True, check=True)
+                    break
+                except subprocess.CalledProcessError as e:
+                    print(f"Error executing command: {e}")
+                    break
+            except KeyboardInterrupt:
+                print("Exiting...")
+                sys.exit(0)
     else:
         print("Describe what you want to do as a single sentence. `shai <sentence>`")
 
