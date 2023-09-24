@@ -131,6 +131,8 @@ def main():
                 # Fallback: treat the message as a command
                 commands.append(msg.message.content)
 
+        # Deduplicate commands
+        commands = list(set(commands))
 
         return commands
 
