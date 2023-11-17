@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 import os
+import platform
 import subprocess
 import sys
 import textwrap
@@ -104,8 +106,14 @@ def main():
             temperature=0,
         )
 
+    if platform.system() == "Linux":
+        info = platform.freedesktop_os_release()
+        plaform_string =  f"The system the shell command will be executed on is {platform.system()} {platform.release()}, running {info['ID']} version {info['VERSION_ID']}."
+    else:
+        plaform_string = f"The system the shell command will be executed on is {platform.system()} {platform.release()}."
+
     system_message = SystemMessage(
-        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```"""
+        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. """ + plaform_string + """ Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```"""
     )
 
     def get_suggestions(prompt):
