@@ -13,16 +13,21 @@ from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 
 from shell_ai.config import load_config
-from shell_ai.code_parser import code_parser
+from shell_ai.code_parser import code_parser, ContextManager
 
 class SelectSystemOptions(Enum):
     OPT_GEN_SUGGESTIONS = "Generate new suggestions"
     OPT_DISMISS = "Dismiss"
+    OPT_NEW_COMMAND = "Enter a new command"
 
 
 class OpenAIOptions(Enum):
     openai = "openai"
     azure = "azure"
+
+class Colors:
+    WARNING = '\033[93m'
+    END = '\033[0m'
 
 
 def main():
@@ -34,6 +39,7 @@ def main():
     - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
     - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
     - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
+    - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
 
     Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
@@ -56,6 +62,10 @@ def main():
             "You can also create `config.json` under `~/.config/shell-ai/` to set the API key, see README.md for more information."
         )
         sys.exit(1)
+
+    TEXT_EDITORS = ("vi", "vim", "emacs", "nano", "ed", "micro", "joe", "nvim")
+
+    CTX = os.environ.get("CTX", "False")
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
@@ -112,11 +122,11 @@ def main():
     else:
         plaform_string = f"The system the shell command will be executed on is {platform.system()} {platform.release()}."
 
-    system_message = SystemMessage(
-        content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. """ + plaform_string + """ Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```"""
-    )
 
     def get_suggestions(prompt):
+        system_message = SystemMessage(
+            content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. """ + plaform_string + """ Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```. Between [], these are the last 1500 tokens from the previous command's output, you can use them as context: ["""+ContextManager.get_ctx()+"""], if it's None, don't take it into consideration."""
+        )
         response = chat.generate(
             messages=[
                 [
@@ -148,9 +158,13 @@ def main():
     prompt = " ".join(sys.argv[1:])
 
     if prompt:
+        if CTX == 'True':
+            print(f"{Colors.WARNING}WARNING{Colors.END} Context mode: datas will be sent to OpenAI, be careful if any sensitive datas...\n")
+            print(f">>> {os.getcwd()}") 
         while True:
             options = get_suggestions(prompt)
             options.append(SelectSystemOptions.OPT_GEN_SUGGESTIONS.value)
+            options.append(SelectSystemOptions.OPT_NEW_COMMAND.value)
             options.append(SelectSystemOptions.OPT_DISMISS.value)
 
             # Get the terminal width
@@ -173,6 +187,9 @@ def main():
                 try:
                     if selection == SelectSystemOptions.OPT_DISMISS.value:
                         sys.exit(0)
+                    elif selection == SelectSystemOptions.OPT_NEW_COMMAND.value:
+                        prompt = input("New command: ") 
+                        continue
                     elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
                         continue
                     if os.environ.get("SHAI_SKIP_CONFIRM") != "true":
@@ -181,11 +198,24 @@ def main():
                         ).execute()
                     else:
                         user_command = selection
-                    subprocess.run(user_command, shell=True, check=True)
-                    break
-                except subprocess.CalledProcessError as e:
-                    print(f"Error executing command: {e}")
-                    break
+                    # Default mode
+                    if CTX == "False":
+                        subprocess.run(user_command, shell=True, check=True)
+                        break
+                    # Context mode
+                    elif user_command.startswith(TEXT_EDITORS):
+                        subprocess.run(user_command, shell=True, check=True)
+                    elif user_command.startswith("cd"):
+                        path = os.path.expanduser('/'.join(user_command.split(" ")[1:]))
+                        os.chdir(path)
+                    else:
+                        result = subprocess.run(user_command, shell=True, check=True, capture_output=True).stdout.decode()
+                        if len(result) > 0:
+                            print(f"\n{result}")
+                        ContextManager.add_chunk(result)
+                    prompt = input(f">>> {os.getcwd()}\nNew command: ") 
+                except Exception as e:
+                    print(f"{Colors.WARNING}Error{Colors.END} executing command: {e}")
             except KeyboardInterrupt:
                 print("Exiting...")
                 sys.exit(0)
