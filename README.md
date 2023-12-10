@@ -55,6 +55,7 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 6. **`OPENAI_API_TYPE`**: Set to "azure" if you are using Azure deployments.
 7. **`AZURE_DEPLOYMENT_NAME`**: Your Azure deployment name (required if using Azure).
 8. **`AZURE_API_BASE`**: Your Azure API base (required if using Azure).
+9. **`CTX`**: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. ***IMPORTANT***: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
 
 ### Configuration File
 
@@ -69,7 +70,8 @@ Example `config.json`:
 {
   "OPENAI_API_KEY": "your_openai_api_key_here",
   "OPENAI_MODEL": "gpt-3.5-turbo",
-  "SHAI_SUGGESTION_COUNT": "3"
+  "SHAI_SUGGESTION_COUNT": "3",
+  "CTX": true
 }
 ```
 

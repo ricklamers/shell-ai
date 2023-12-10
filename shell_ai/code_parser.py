@@ -1,5 +1,7 @@
 import mistune
+from collections import deque
 
+MAX_CONTEXT_TOKENS = 1500
 
 class PythonCodeBlockParser(mistune.HTMLRenderer):
     def __init__(self, *args, **kwargs):
@@ -16,6 +18,36 @@ class PythonCodeBlockParser(mistune.HTMLRenderer):
         self.code_blocks.append(code)
         return super().block_code(code)
 
+class _ContextManager:
+    """
+    Store console outputs in context mode.
+    """
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.max_tokens = MAX_CONTEXT_TOKENS
+            cls._instance.token_buffer = deque(maxlen=MAX_CONTEXT_TOKENS)
+        return cls._instance
+
+    def add_token(self, token):
+        self.token_buffer.append(token)
+    
+    def flush(self):
+        self.token_buffer.clear()
+    
+    def add_chunk(self, chunk):
+        self.flush()
+        for c in chunk:
+            self.add_token(c)
+
+    def get_ctx(self):
+        if len(self.token_buffer) == 0:
+            return 'None'
+        return ''.join(list(self.token_buffer))
+
+ContextManager = _ContextManager()
 
 def code_parser(markdown):
     """
