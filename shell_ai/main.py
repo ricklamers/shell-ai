@@ -6,6 +6,7 @@ import sys
 import textwrap
 from enum import Enum
 import json
+import argparse
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
@@ -66,6 +67,17 @@ def main():
     TEXT_EDITORS = ("vi", "vim", "emacs", "nano", "ed", "micro", "joe", "nvim")
 
     CTX = os.environ.get("CTX", "False")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--ctx', action='store_true', help='Set context mode to True.')
+    parser.add_argument('prompt', type=str, nargs='*', default=None)
+    args = parser.parse_args()
+    if args.ctx:
+        prompt = args.prompt
+        CTX = 'True'
+    else:
+        # Consume all arguments after the script name as a single sentence
+        prompt = " ".join(sys.argv[1:])
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
@@ -153,9 +165,6 @@ def main():
         commands = list(set(commands))
 
         return commands
-
-    # Consume all arguments after the script name as a single sentence
-    prompt = " ".join(sys.argv[1:])
 
     if prompt:
         if CTX == 'True':

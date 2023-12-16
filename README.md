@@ -57,6 +57,12 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 8. **`AZURE_API_BASE`**: Your Azure API base (required if using Azure).
 9. **`CTX`**: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. ***IMPORTANT***: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
 
+You can also enable context mode in command line with `--ctx` flag:
+
+```bash
+shai --ctx [request]
+```
+
 ### Configuration File
 
 Alternatively, you can store these variables in a JSON configuration file:
