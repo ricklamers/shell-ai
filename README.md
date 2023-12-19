@@ -1,4 +1,4 @@
-# Shell-AI: Your Intelligent Command-Line Companion
+# Shell-AI: let AI write your shell commands
 
 [![PyPI version](https://badge.fury.io/py/shell-ai.svg)](https://pypi.org/project/shell-ai/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
