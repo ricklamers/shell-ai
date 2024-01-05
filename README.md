@@ -48,14 +48,15 @@ Shell-AI will then suggest 3 commands to fulfill your request:
 ### Optional Variables
 
 1. **`OPENAI_MODEL`**: Defaults to `gpt-3.5-turbo`. You can set it to another OpenAI model if desired.
-2. **`SHAI_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
-3. **`OPENAI_API_BASE`**: Defaults to `https://api.openai.com/v1`. You can set it to specify the proxy or service emulator.
-4. **`OPENAI_ORGANIZATION`**: OpenAI Organization ID
-5. **`OPENAI_PROXY`**: OpenAI proxy
-6. **`OPENAI_API_TYPE`**: Set to "azure" if you are using Azure deployments.
-7. **`AZURE_DEPLOYMENT_NAME`**: Your Azure deployment name (required if using Azure).
-8. **`AZURE_API_BASE`**: Your Azure API base (required if using Azure).
-9. **`CTX`**: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. ***IMPORTANT***: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
+2. **`OPENAI_MAX_TOKENS`**: Defaults to `None`. You can set the maximum number of tokens that can be generated in the chat completion.
+3. **`SHAI_SUGGESTION_COUNT`**: Defaults to 3. You can set it to specify the number of suggestions to generate.
+4. **`OPENAI_API_BASE`**: Defaults to `https://api.openai.com/v1`. You can set it to specify the proxy or service emulator.
+5. **`OPENAI_ORGANIZATION`**: OpenAI Organization ID
+6. **`OPENAI_PROXY`**: OpenAI proxy
+7. **`OPENAI_API_TYPE`**: Set to "azure" if you are using Azure deployments.
+8. **`AZURE_DEPLOYMENT_NAME`**: Your Azure deployment name (required if using Azure).
+9. **`AZURE_API_BASE`**: Your Azure API base (required if using Azure).
+10. **`CTX`**: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. ***IMPORTANT***: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
 
 You can also enable context mode in command line with `--ctx` flag:
 
