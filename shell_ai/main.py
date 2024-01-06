@@ -80,6 +80,7 @@ def main():
         prompt = " ".join(sys.argv[1:])
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
@@ -116,6 +117,7 @@ def main():
             openai_api_base=OPENAI_API_BASE,
             openai_organization=OPENAI_ORGANIZATION,
             openai_proxy=OPENAI_PROXY,
+            max_tokens=OPENAI_MAX_TOKENS,
         )
     if OPENAI_API_TYPE == "azure":
         chat = AzureChatOpenAI(
