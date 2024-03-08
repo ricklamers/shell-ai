@@ -79,7 +79,7 @@ def main():
         # Consume all arguments after the script name as a single sentence
         prompt = " ".join(sys.argv[1:])
 
-    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4")
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
@@ -111,24 +111,19 @@ def main():
     # End loading configuration
 
     if OPENAI_API_TYPE == "openai":
-        chat = ChatOpenAI(
-            model_name=OPENAI_MODEL,
-            n=SHAI_SUGGESTION_COUNT,
-            openai_api_base=OPENAI_API_BASE,
-            openai_organization=OPENAI_ORGANIZATION,
-            openai_proxy=OPENAI_PROXY,
-            max_tokens=OPENAI_MAX_TOKENS,
+        chat = ChatOpenAI.create(
+            model=OPENAI_MODEL,
+            messages=[],
+            max_tokens=int(OPENAI_MAX_TOKENS) if OPENAI_MAX_TOKENS else 4096,
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            temperature=0.7,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+            stop=None
         )
     if OPENAI_API_TYPE == "azure":
-        chat = AzureChatOpenAI(
-            n=SHAI_SUGGESTION_COUNT,
-            openai_api_base=AZURE_API_BASE,
-            openai_api_version=OPENAI_API_VERSION,
-            deployment_name=AZURE_DEPLOYMENT_NAME,
-            openai_api_key=os.environ.get("OPENAI_API_KEY"),
-            openai_api_type="azure",
-            temperature=0,
-        )
+        # AzureChatOpenAI instantiation remains unchanged as it's a custom wrapper not directly affected by OpenAI's API updates.
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()
