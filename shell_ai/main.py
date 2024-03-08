@@ -79,7 +79,7 @@ def main():
         # Consume all arguments after the script name as a single sentence
         prompt = " ".join(sys.argv[1:])
 
-    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4")
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
@@ -89,7 +89,7 @@ def main():
     # required configs just for azure openai deployments (faster)
 
     OPENAI_API_TYPE = os.environ.get("OPENAI_API_TYPE", "openai")
-    OPENAI_API_VERSION = os.environ.get("OPENAI_API_VERSION", "2023-05-15")
+    OPENAI_API_VERSION = os.environ.get("OPENAI_API_VERSION", "2023-09-01")
     if OPENAI_API_TYPE not in OpenAIOptions.__members__:
         print(
             f"Your OPENAI_API_TYPE is not valid. Please choose one of {OpenAIOptions.__members__}"
