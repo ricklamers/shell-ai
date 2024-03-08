@@ -10,7 +10,7 @@ import argparse
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
-from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
+from langchain_openai.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 
 from shell_ai.config import load_config
