@@ -10,7 +10,7 @@ import argparse
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
-from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
+from langchain.openai_chat_models import AzureChatGPT, ChatGPT
 from langchain.schema import HumanMessage, SystemMessage
 
 from shell_ai.config import load_config
@@ -111,7 +111,7 @@ def main():
     # End loading configuration
 
     if OPENAI_API_TYPE == "openai":
-        chat = ChatOpenAI(
+        chat = ChatGPT(
             model_name=OPENAI_MODEL,
             n=SHAI_SUGGESTION_COUNT,
             openai_api_base=OPENAI_API_BASE,
@@ -120,7 +120,7 @@ def main():
             max_tokens=OPENAI_MAX_TOKENS,
         )
     if OPENAI_API_TYPE == "azure":
-        chat = AzureChatOpenAI(
+        chat = AzureChatGPT(
             n=SHAI_SUGGESTION_COUNT,
             openai_api_base=AZURE_API_BASE,
             openai_api_version=OPENAI_API_VERSION,
