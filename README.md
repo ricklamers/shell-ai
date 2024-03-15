@@ -18,6 +18,8 @@ You can install Shell-AI directly from PyPI using pip:
 pip install shell-ai
 ```
 
+Note that on Linux, Python 3.10 or later is required.
+
 After installation, you can invoke the utility using the `shai` command.
 
 ## Usage
