@@ -7,6 +7,7 @@ import textwrap
 from enum import Enum
 import json
 import argparse
+import time
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
@@ -40,6 +41,7 @@ def main():
     - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
     - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
     - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
+    - SHAI_SKIP_HISTORY: Skip writing selected command to shell history (currently supported shells are zsh, bash, csh, tcsh, ksh, and fish). Defaults to false. Set to `true` to skip writing.
     - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
 
     Additional required environment variables for Azure Deployments:
@@ -149,7 +151,7 @@ def main():
                 ]
             ]
         )
-        
+
         # Extract commands from the JSON response
         commands = []
         for msg in response.generations[0]:
@@ -199,7 +201,7 @@ def main():
                     if selection == SelectSystemOptions.OPT_DISMISS.value:
                         sys.exit(0)
                     elif selection == SelectSystemOptions.OPT_NEW_COMMAND.value:
-                        prompt = input("New command: ") 
+                        prompt = input("New command: ")
                         continue
                     elif selection == SelectSystemOptions.OPT_GEN_SUGGESTIONS.value:
                         continue
@@ -209,6 +211,37 @@ def main():
                         ).execute()
                     else:
                         user_command = selection
+
+                    # Write executed command to shell history for easy reuse.
+                    if os.environ.get("SHAI_SKIP_HISTORY") != "true":
+                        # Determine active shell and write to history
+                        shell = os.environ.get("SHELL", "")
+                        history_file_path = None
+                        history_format = None
+                        if "zsh" in shell:
+                            history_file_path = os.path.expanduser("~/.zsh_history")
+                            history_format = ": {}:0;{}\n"
+                        elif "bash" in shell:
+                            history_file_path = os.path.expanduser("~/.bash_history")
+                            history_format = ": {}:0;{}\n"
+                        elif "csh" in shell or "tcsh" in shell:
+                            # csh and tcsh share the same history file
+                            history_file_path = os.path.expanduser("~/.history")
+                            history_format = "{} {}\n"
+                        elif "ksh" in shell:
+                            history_file_path = os.path.expanduser("~/.sh_history")
+                            history_format = ": {}:0;{}\n"
+                        elif "fish" in shell:
+                            history_file_path = os.path.expanduser("~/.local/share/fish/fish_history")
+                            history_format = "- cmd: {}\n  when: {}\n"
+
+                        if history_file_path:
+                            with open(history_file_path, "a") as history_file:
+                                timestamp = int(time.time())
+                                history_file.write(history_format.format(timestamp, user_command))
+                        else:
+                            print(f"{Colors.WARNING}Warning:{Colors.END} Unsupported shell. History will not be saved. Please set SHAI_SKIP_HISTORY to true to disable.")
+
                     # Default mode
                     if CTX == "False":
                         subprocess.run(user_command, shell=True, check=True)
