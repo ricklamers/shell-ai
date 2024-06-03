@@ -134,7 +134,7 @@ def main():
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()
-        plaform_string =  f"The system the shell command will be executed on is {platform.system()} {platform.release()}, running {info['ID']} version {info.get('VERSION_ID', info['BUILD_ID'])}."
+        plaform_string =  f"The system the shell command will be executed on is {platform.system()} {platform.release()}, running {info.get('ID')} version {info.get('VERSION_ID', info.get('BUILD_ID'))}."
     else:
         plaform_string = f"The system the shell command will be executed on is {platform.system()} {platform.release()}."
 
