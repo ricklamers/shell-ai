@@ -13,9 +13,11 @@ from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
 from langchain_openai.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
 
 from shell_ai.config import load_config
 from shell_ai.code_parser import code_parser, ContextManager
+from shell_ai.parallel_suggestions import generate_suggestions_parallel
 
 class SelectSystemOptions(Enum):
     OPT_GEN_SUGGESTIONS = "Generate new suggestions"
@@ -23,14 +25,18 @@ class SelectSystemOptions(Enum):
     OPT_NEW_COMMAND = "Enter a new command"
 
 
-class OpenAIOptions(Enum):
+class APIProvider(Enum):
     openai = "openai"
     azure = "azure"
+    groq = "groq"
 
 class Colors:
     WARNING = '\033[93m'
     END = '\033[0m'
 
+def debug_print(*args, **kwargs):
+    if os.environ.get("DEBUG", "").lower() == "true":
+        print(*args, **kwargs)
 
 def main():
     """
@@ -43,6 +49,7 @@ def main():
     - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
     - SHAI_SKIP_HISTORY: Skip writing selected command to shell history (currently supported shells are zsh, bash, csh, tcsh, ksh, and fish). Defaults to false. Set to `true` to skip writing.
     - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
+    - SHAI_TEMPERATURE: Controls randomness in the output. Lower values make output more focused and deterministic (default: 0.05).
 
     Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
@@ -57,9 +64,20 @@ def main():
     for key, value in loaded_config.items():
         os.environ[key] = str(value)
 
-    if os.environ.get("OPENAI_API_KEY") is None:
+    # Dump environment variables for debugging
+    debug_print("Environment variables:")
+    for key, value in os.environ.items():
+        debug_print(f"{key}={value}")
+
+    # Dump loaded configuration for debugging
+    debug_print("\nLoaded configuration:")
+    for key, value in loaded_config.items():
+        debug_print(f"{key}={value}")
+    debug_print()
+
+    if os.environ.get("OPENAI_API_KEY") is None and os.environ.get("GROQ_API_KEY") is None:
         print(
-            "Please set the OPENAI_API_KEY environment variable to your OpenAI API key."
+            "Please set either the OPENAI_API_KEY or GROQ_API_KEY environment variable."
         )
         print(
             "You can also create `config.json` under `~/.config/shell-ai/` to set the API key, see README.md for more information."
@@ -81,93 +99,144 @@ def main():
         # Consume all arguments after the script name as a single sentence
         prompt = " ".join(sys.argv[1:])
 
-    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    OPENAI_MODEL = os.environ.get("OPENAI_MODEL", loaded_config.get("OPENAI_MODEL"))
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
-    SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", 3))
+    SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", loaded_config.get("SHAI_SUGGESTION_COUNT", "3")))
 
     # required configs just for azure openai deployments (faster)
+    SHAI_API_PROVIDER = os.environ.get("SHAI_API_PROVIDER", loaded_config.get("SHAI_API_PROVIDER", "openai"))
 
-    OPENAI_API_TYPE = os.environ.get("OPENAI_API_TYPE", "openai")
     OPENAI_API_VERSION = os.environ.get("OPENAI_API_VERSION", "2023-05-15")
-    if OPENAI_API_TYPE not in OpenAIOptions.__members__:
+    if SHAI_API_PROVIDER not in APIProvider.__members__:
         print(
-            f"Your OPENAI_API_TYPE is not valid. Please choose one of {OpenAIOptions.__members__}"
+            f"Your SHAI_API_PROVIDER is not valid. Please choose one of {APIProvider.__members__}"
         )
         sys.exit(1)
+
     AZURE_DEPLOYMENT_NAME = os.environ.get("AZURE_DEPLOYMENT_NAME", None)
     AZURE_API_BASE = os.environ.get("AZURE_API_BASE", None)
-    if OPENAI_API_TYPE == "azure" and AZURE_DEPLOYMENT_NAME is None:
+    if SHAI_API_PROVIDER == "azure" and AZURE_DEPLOYMENT_NAME is None:
         print(
             "Please set the AZURE_DEPLOYMENT_NAME environment variable to your Azure deployment name."
         )
         sys.exit(1)
-    if OPENAI_API_TYPE == "azure" and AZURE_API_BASE is None:
+    if SHAI_API_PROVIDER == "azure" and AZURE_API_BASE is None:
         print(
             "Please set the AZURE_API_BASE environment variable to your Azure API base."
         )
         sys.exit(1)
 
-    # End loading configuration
+    # Groq configuration
+    GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+    GROQ_MODEL = os.environ.get("GROQ_MODEL", loaded_config.get("GROQ_MODEL"))
+    if SHAI_API_PROVIDER == "groq" and not GROQ_API_KEY:
+        print(
+            "Please set the GROQ_API_KEY environment variable to your Groq API key."
+        )
+        sys.exit(1)
 
-    if OPENAI_API_TYPE == "openai":
+    # End loading configuration
+    if SHAI_API_PROVIDER == "openai":
         chat = ChatOpenAI(
             model_name=OPENAI_MODEL,
-            n=SHAI_SUGGESTION_COUNT,
             openai_api_base=OPENAI_API_BASE,
             openai_organization=OPENAI_ORGANIZATION,
             openai_proxy=OPENAI_PROXY,
             max_tokens=OPENAI_MAX_TOKENS,
+            temperature=0.05,
         )
-    if OPENAI_API_TYPE == "azure":
+    elif SHAI_API_PROVIDER == "azure":
         chat = AzureChatOpenAI(
-            n=SHAI_SUGGESTION_COUNT,
             openai_api_base=AZURE_API_BASE,
             openai_api_version=OPENAI_API_VERSION,
             deployment_name=AZURE_DEPLOYMENT_NAME,
             openai_api_key=os.environ.get("OPENAI_API_KEY"),
             openai_api_type="azure",
-            temperature=0,
+            temperature=0.05,
+        )
+    elif SHAI_API_PROVIDER == "groq":
+        chat = ChatGroq(
+            model_name=GROQ_MODEL,
+            groq_api_key=GROQ_API_KEY,
+            temperature=0.05,
+        )
+
+    # Get temperature from config or environment
+    SHAI_TEMPERATURE = float(os.environ.get("SHAI_TEMPERATURE", loaded_config.get("SHAI_TEMPERATURE", "0.05")))
+
+    # Update chat initialization for each provider
+    if SHAI_API_PROVIDER == "openai":
+        chat = ChatOpenAI(
+            model_name=OPENAI_MODEL,
+            openai_api_base=OPENAI_API_BASE,
+            openai_organization=OPENAI_ORGANIZATION,
+            openai_proxy=OPENAI_PROXY,
+            max_tokens=OPENAI_MAX_TOKENS,
+            temperature=SHAI_TEMPERATURE,
+        )
+    elif SHAI_API_PROVIDER == "azure":
+        chat = AzureChatOpenAI(
+            openai_api_base=AZURE_API_BASE,
+            openai_api_version=OPENAI_API_VERSION,
+            deployment_name=AZURE_DEPLOYMENT_NAME,
+            openai_api_key=os.environ.get("OPENAI_API_KEY"),
+            openai_api_type="azure",
+            temperature=SHAI_TEMPERATURE,
+        )
+    elif SHAI_API_PROVIDER == "groq":
+        chat = ChatGroq(
+            model_name=GROQ_MODEL,
+            groq_api_key=GROQ_API_KEY,
+            temperature=SHAI_TEMPERATURE,
         )
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()
-        plaform_string =  f"The system the shell command will be executed on is {platform.system()} {platform.release()}, running {info.get('ID')} version {info.get('VERSION_ID', info.get('BUILD_ID'))}."
+        plaform_string =  f"The system the shell command will be executed on is {platform.system()} {platform.release()}, running {info.get('ID')} version {info.get('VERSION_ID', info.get('BUILD_ID'))}. \n"
     else:
-        plaform_string = f"The system the shell command will be executed on is {platform.system()} {platform.release()}."
+        plaform_string = f"The system the shell command will be executed on is {platform.system()} {platform.release()}. \n"
 
 
     def get_suggestions(prompt):
-        system_message = SystemMessage(
-            content="""You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. """ + plaform_string + """ Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message 'Hello, World!', you should respond with ```json\n{"command": "echo 'Hello, World!'"}```. Between [], these are the last 1500 tokens from the previous command's output, you can use them as context: ["""+ContextManager.get_ctx()+"""], if it's None, don't take it into consideration."""
-        )
-        response = chat.generate(
-            messages=[
-                [
-                    system_message,
-                    HumanMessage(content=f"Here's what I'm trying to do: {prompt}"),
-                ]
-            ]
-        )
+        base_system_message = """You are an expert at using shell commands. I need you to provide a response in the format `{"command": "your_shell_command_here"}`. """ + plaform_string + """ Only provide a single executable line of shell code as the value for the "command" key. Never output any text outside the JSON structure. The command will be directly executed in a shell. For example, if I ask to display the message abc, you should respond with ```json\n{"command": "echo abc"}\n```. Make sure the output is valid JSON."""
+        
+        ctx = ContextManager.get_ctx()
+        if ctx:
+            base_system_message += """ Between [], these are the last 1500 tokens from the previous command's output, you can use them as context: [""" + ctx + """]"""
 
-        # Extract commands from the JSON response
-        commands = []
-        for msg in response.generations[0]:
+        system_message = SystemMessage(content=base_system_message)
+
+        def generate_single_suggestion():
+            messages = [
+                system_message,
+                HumanMessage(content=f"Generate a shell command that satisfies this user request: {prompt}"),
+            ]
+            debug_print(f"Messages: {messages}")
+            response = chat.generate(
+                messages=[messages]
+            )
             try:
-                json_content = code_parser(msg.message.content)
+                debug_print(f"Response: {response.generations[0][0].message.content}")
+                json_content = code_parser(response.generations[0][0].message.content)
                 command_json = json.loads(json_content)
                 command = command_json.get("command", "")
-                if command:  # Ensure the command is not empty
-                    commands.append(command)
-            except json.JSONDecodeError:
-                # Fallback: treat the message as a command
-                commands.append(msg.message.content)
+                return command if command else None
+            except (json.JSONDecodeError, IndexError):
+                return None
 
-        # Deduplicate commands
-        commands = list(set(commands))
-
+        # Generate suggestions in parallel with max 4 workers
+        commands = generate_suggestions_parallel(
+            generate_single_suggestion,
+            count=SHAI_SUGGESTION_COUNT,
+            max_workers=4
+        )
+        
+        # Filter out None values and deduplicate
+        commands = list(set(cmd for cmd in commands if cmd))
+        
         return commands
 
     if prompt:

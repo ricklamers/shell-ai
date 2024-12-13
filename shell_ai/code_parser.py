@@ -44,7 +44,7 @@ class _ContextManager:
 
     def get_ctx(self):
         if len(self.token_buffer) == 0:
-            return 'None'
+            return ''
         return ''.join(list(self.token_buffer))
 
 ContextManager = _ContextManager()
