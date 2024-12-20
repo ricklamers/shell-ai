@@ -139,35 +139,11 @@ def main():
         sys.exit(1)
 
     # End loading configuration
-    if SHAI_API_PROVIDER == "openai":
-        chat = ChatOpenAI(
-            model_name=OPENAI_MODEL,
-            openai_api_base=OPENAI_API_BASE,
-            openai_organization=OPENAI_ORGANIZATION,
-            openai_proxy=OPENAI_PROXY,
-            max_tokens=OPENAI_MAX_TOKENS,
-            temperature=0.05,
-        )
-    elif SHAI_API_PROVIDER == "azure":
-        chat = AzureChatOpenAI(
-            openai_api_base=AZURE_API_BASE,
-            openai_api_version=OPENAI_API_VERSION,
-            deployment_name=AZURE_DEPLOYMENT_NAME,
-            openai_api_key=os.environ.get("OPENAI_API_KEY"),
-            openai_api_type="azure",
-            temperature=0.05,
-        )
-    elif SHAI_API_PROVIDER == "groq":
-        chat = ChatGroq(
-            model_name=GROQ_MODEL,
-            groq_api_key=GROQ_API_KEY,
-            temperature=0.05,
-        )
-
+    
     # Get temperature from config or environment
     SHAI_TEMPERATURE = float(os.environ.get("SHAI_TEMPERATURE", loaded_config.get("SHAI_TEMPERATURE", "0.05")))
 
-    # Update chat initialization for each provider
+    # Initialize chat provider based on configuration
     if SHAI_API_PROVIDER == "openai":
         chat = ChatOpenAI(
             model_name=OPENAI_MODEL,
