@@ -29,6 +29,7 @@ class APIProvider(Enum):
     openai = "openai"
     azure = "azure"
     groq = "groq"
+    ollama = "ollama"
 
 class Colors:
     WARNING = '\033[93m'
@@ -45,6 +46,7 @@ def main():
 
     Allowed envionment variables:
     - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
+    - OLLAMA_MODEL: The name of the Ollama model to use. Defaults to `phi3.5`.
     - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
     - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
     - SHAI_SKIP_HISTORY: Skip writing selected command to shell history (currently supported shells are zsh, bash, csh, tcsh, ksh, and fish). Defaults to false. Set to `true` to skip writing.
@@ -100,7 +102,10 @@ def main():
         prompt = " ".join(sys.argv[1:])
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", loaded_config.get("OPENAI_MODEL"))
+    OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", None)
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
+    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", None)
+    OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE"))
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
@@ -168,6 +173,14 @@ def main():
             groq_api_key=GROQ_API_KEY,
             temperature=SHAI_TEMPERATURE,
         )
+    elif SHAI_API_PROVIDER == "ollama":
+         chat = ChatOpenAI(
+            model_name=OLLAMA_MODEL,
+            openai_api_base=OLLAMA_API_BASE,
+            max_tokens=OLLAMA_MAX_TOKENS,
+            temperature=SHAI_TEMPERATURE,
+            api_key="ollama"
+         )
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()
