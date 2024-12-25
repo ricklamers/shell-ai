@@ -48,7 +48,7 @@ Shell-AI can be configured through environment variables or a config file locate
 
 ### Environment Variables
 
-- `OPENAI_API_KEY`: (Required) Your OpenAI API key
+- `OPENAI_API_KEY`: (Required) Your OpenAI API key, leave empty if you use ollama
 - `GROQ_API_KEY`: (Required if using Groq) Your Groq API key
 - `OPENAI_MODEL`: The OpenAI model to use (default: "gpt-3.5-turbo")
 - `SHAI_SUGGESTION_COUNT`: Number of suggestions to generate (default: 3)
@@ -69,6 +69,18 @@ Shell-AI can be configured through environment variables or a config file locate
 }
 ```
 
+
+### Config Example for Ollama
+```json
+   {
+   "OPENAI_API_KEY":"",
+   "SHAI_SUGGESTION_COUNT": "3",
+   "SHAI_API_PROVIDER": "ollama",
+   "OLLAMA_MODEL": "phi3.5",
+   "OLLAMA_API_BASE": "http://localhost:11434/v1/",
+   "SHAI_TEMPERATURE": "0.05"
+   }
+```
 The application will read from this file if it exists, overriding any existing environment variables.
 
 Run the application after setting these configurations.
