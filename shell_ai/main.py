@@ -52,7 +52,7 @@ def main():
     - SHAI_SKIP_HISTORY: Skip writing selected command to shell history (currently supported shells are zsh, bash, csh, tcsh, ksh, and fish). Defaults to false. Set to `true` to skip writing.
     - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
     - SHAI_TEMPERATURE: Controls randomness in the output. Lower values make output more focused and deterministic (default: 0.05).
-
+    - OLLAMA_API_BASE: The Ollama endpoint to use (default: "http://localhost:11434/v1/").
     Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
     - OPENAI_API_TYPE: "azure"
@@ -102,10 +102,10 @@ def main():
         prompt = " ".join(sys.argv[1:])
 
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", loaded_config.get("OPENAI_MODEL"))
-    OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", None)
+    OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", loaded_config.get("OLLAMA_MODEL","phi3.5"))
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
-    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", None)
-    OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE"))
+    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500)))
+    OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE","http://localhost:11434/v1/"))
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)

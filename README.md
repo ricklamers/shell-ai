@@ -54,9 +54,11 @@ Shell-AI can be configured through environment variables or a config file locate
 - `SHAI_SUGGESTION_COUNT`: Number of suggestions to generate (default: 3)
 - `SHAI_SKIP_CONFIRM`: Skip command confirmation when set to "true"
 - `SHAI_SKIP_HISTORY`: Skip writing to shell history when set to "true"
-- `SHAI_API_PROVIDER`: Choose between "openai", "azure", or "groq" (default: "groq")
+- `SHAI_API_PROVIDER`: Choose between "openai", "ollama", "azure", or "groq" (default: "groq")
 - `SHAI_TEMPERATURE`: Controls randomness in the output (default: 0.05). Lower values (e.g., 0.05) make output more focused and deterministic, while higher values (e.g., 0.7) make it more creative and varied.
 - `CTX`: Enable context mode when set to "true" (Note: outputs will be sent to the API)
+- `OLLAMA_MODEL`: The Ollama model to use (default: "phi3.5")
+- `OLLAMA_API_BASE`: The Ollama endpoint to use (default: "http://localhost:11434/v1/")
 
 ### Config File Example
 
