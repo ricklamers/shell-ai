@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import platform
 import subprocess
@@ -29,6 +28,7 @@ class APIProvider(Enum):
     openai = "openai"
     azure = "azure"
     groq = "groq"
+    deepseek = "deepseek"
     ollama = "ollama"
 
 class Colors:
@@ -39,7 +39,7 @@ def debug_print(*args, **kwargs):
     if os.environ.get("DEBUG", "").lower() == "true":
         print(*args, **kwargs)
 
-def main():
+def main(SHAI_API_PROVIDER=None):
     """
     Required environment variables:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
@@ -47,6 +47,7 @@ def main():
     Allowed envionment variables:
     - OPENAI_MODEL: The name of the OpenAI model to use. Defaults to `gpt-3.5-turbo`.
     - OLLAMA_MODEL: The name of the Ollama model to use. Defaults to `phi3.5`.
+    - DEEPSEEK_MODEL: The name of the DeepSeek model to use. Defaults to `deepseek-chat`.
     - SHAI_SUGGESTION_COUNT: The number of suggestions to generate. Defaults to 3.
     - SHAI_SKIP_CONFIRM: Skip confirmation of the command to execute. Defaults to false. Set to `true` to skip confirmation.
     - SHAI_SKIP_HISTORY: Skip writing selected command to shell history (currently supported shells are zsh, bash, csh, tcsh, ksh, and fish). Defaults to false. Set to `true` to skip writing.
@@ -55,7 +56,7 @@ def main():
     - OLLAMA_API_BASE: The Ollama endpoint to use (default: "http://localhost:11434/v1/").
     Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
-    - OPENAI_API_TYPE: "azure"
+    - OPENAI_API_TYPE: "azure" | "deepseek"
     - AZURE_API_BASE
     - AZURE_DEPLOYMENT_NAME
     """
@@ -77,9 +78,11 @@ def main():
         debug_print(f"{key}={value}")
     debug_print()
 
-    if os.environ.get("OPENAI_API_KEY") is None and os.environ.get("GROQ_API_KEY") is None:
+    if os.environ.get("OPENAI_API_KEY") is None \
+       and os.environ.get("GROQ_API_KEY") is None \
+       and os.environ.get("DEEPSEEK_API_KEY") is None:
         print(
-            "Please set either the OPENAI_API_KEY or GROQ_API_KEY environment variable."
+            "Please set one of: OPENAI_API_KEY, GROQ_API_KEY or DEEPSEEK_API_KEY."
         )
         print(
             "You can also create `config.json` under `~/.config/shell-ai/` to set the API key, see README.md for more information."
@@ -104,12 +107,19 @@ def main():
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", loaded_config.get("OPENAI_MODEL"))
     OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", loaded_config.get("OLLAMA_MODEL","phi3.5"))
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
-    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500)))
+    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500))
     OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE","http://localhost:11434/v1/"))
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
     SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", loaded_config.get("SHAI_SUGGESTION_COUNT", "3")))
+    DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", None)
+    DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", loaded_config.get("DEEPSEEK_MODEL", "deepseek-chat"))
+    if SHAI_API_PROVIDER == "deepseek" and not DEEPSEEK_API_KEY:
+        print(
+            "Please set the DEEPSEEK_API_KEY environment variable."
+        )
+        sys.exit(1)
 
     # required configs just for azure openai deployments (faster)
     SHAI_API_PROVIDER = os.environ.get("SHAI_API_PROVIDER", loaded_config.get("SHAI_API_PROVIDER", "openai"))
@@ -181,6 +191,14 @@ def main():
             temperature=SHAI_TEMPERATURE,
             api_key="ollama"
          )
+
+    elif SHAI_API_PROVIDER == "deepseek":
+        chat = ChatOpenAI(
+            base_url="https://api.deepseek.com",
+            model_name=DEEPSEEK_MODEL,
+            openai_api_key=DEEPSEEK_API_KEY,
+            temperature=SHAI_TEMPERATURE,
+        )
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()
