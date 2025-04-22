@@ -104,7 +104,7 @@ def main():
     OPENAI_MODEL = os.environ.get("OPENAI_MODEL", loaded_config.get("OPENAI_MODEL"))
     OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", loaded_config.get("OLLAMA_MODEL","phi3.5"))
     OPENAI_MAX_TOKENS = os.environ.get("OPENAI_MAX_TOKENS", None)
-    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500)))
+    OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500))
     OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE","http://localhost:11434/v1/"))
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
