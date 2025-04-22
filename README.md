@@ -49,8 +49,9 @@ Shell-AI can be configured through environment variables or a config file locate
 ### Environment Variables
 
 - `OPENAI_API_KEY`: (Required) Your OpenAI API key, leave empty if you use ollama
-- `GROQ_API_KEY`: (Required if using Groq) Your Groq API key
 - `OPENAI_MODEL`: The OpenAI model to use (default: "gpt-3.5-turbo")
+- `OPENAI_API_BASE`: The OpenAI API / OpenAI compatible API endpoint to use (default: None)
+- `GROQ_API_KEY`: (Required if using Groq) Your Groq API key
 - `SHAI_SUGGESTION_COUNT`: Number of suggestions to generate (default: 3)
 - `SHAI_SKIP_CONFIRM`: Skip command confirmation when set to "true"
 - `SHAI_SKIP_HISTORY`: Skip writing to shell history when set to "true"
@@ -71,6 +72,19 @@ Shell-AI can be configured through environment variables or a config file locate
 }
 ```
 
+### Config Example for OpenAI compatible
+
+```json
+{
+   "SHAI_API_PROVIDER": "openai",
+   "OPENAI_API_KEY": "deepseek_api_key",
+   "OPENAI_API_BASE": "https://api.deepseek.com",
+   "OPENAI_MODEL": "deekseek-chat",
+   "SHAI_SUGGESTION_COUNT": "3",
+   "SHAI_SUGGESTION_COUNT": "3",
+   "CTX": true
+}
+```
 
 ### Config Example for Ollama
 ```json
