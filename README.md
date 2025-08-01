@@ -5,8 +5,6 @@
 [![Forks](https://img.shields.io/github/forks/ricklamers/shell-ai)](https://github.com/ricklamers/shell-ai/network)
 [![Stars](https://img.shields.io/github/stars/ricklamers/shell-ai)](https://github.com/ricklamers/shell-ai/stargazers)
 
-
-
 Shell-AI (`shai`) is a CLI utility that brings the power of natural language understanding to your command line. Simply input what you want to do in natural language, and `shai` will suggest single-line commands that achieve your intent. Under the hood, Shell-AI leverages the [LangChain](https://github.com/langchain-ai/langchain) for LLM use and builds on the excellent [InquirerPy](https://github.com/kazhala/InquirerPy) for the interactive CLI.
 
 ![demo-shell-ai](https://github.com/ricklamers/shell-ai/assets/1309307/b4057165-5c23-46d4-b68e-00915b738dc3)
@@ -32,7 +30,6 @@ shai run terraform dry run thingy
 ```
 
 Shell-AI will then suggest 3 commands to fulfill your request:
-
 - `terraform plan`
 - `terraform plan -input=false`
 - `terraform plan`
@@ -125,7 +122,6 @@ To use Shell AI with Groq:
 
 1. Get your API key from Groq
 2. Set the following environment variables:
-   
    ```bash
    export SHAI_API_PROVIDER=groq
    export GROQ_API_KEY=your_api_key_here
