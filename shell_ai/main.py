@@ -54,7 +54,7 @@ def main():
     - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
     - SHAI_TEMPERATURE: Controls randomness in the output. Lower values make output more focused and deterministic (default: 0.05).
     - OLLAMA_API_BASE: The Ollama endpoint to use (default: "http://localhost:11434/v1/").
-    Additional required environment ChatOpenAIvariables for Azure Deployments:
+    Additional required environment variables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
     - OPENAI_API_TYPE: "azure"
     - AZURE_API_BASE
