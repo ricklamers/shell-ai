@@ -14,7 +14,7 @@ from InquirerPy.base.control import Choice
 from langchain_openai.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
-
+from langchain_mistralai import ChatMistralAI
 from shell_ai.config import load_config
 from shell_ai.code_parser import code_parser, ContextManager
 from shell_ai.parallel_suggestions import generate_suggestions_parallel
@@ -30,6 +30,7 @@ class APIProvider(Enum):
     azure = "azure"
     groq = "groq"
     ollama = "ollama"
+    mistral = "mistral"
 
 class Colors:
     WARNING = '\033[93m'
@@ -53,7 +54,7 @@ def main():
     - CTX: Allow the assistant to keep the console outputs as context allowing the LLM to produce more precise outputs. IMPORTANT: the outputs will be sent to OpenAI through their API, be careful if any sensitive data. Default to false.
     - SHAI_TEMPERATURE: Controls randomness in the output. Lower values make output more focused and deterministic (default: 0.05).
     - OLLAMA_API_BASE: The Ollama endpoint to use (default: "http://localhost:11434/v1/").
-    Additional required environment variables for Azure Deployments:
+    Additional required environment ChatOpenAIvariables for Azure Deployments:
     - OPENAI_API_KEY: Your OpenAI API key. You can find this on https://beta.openai.com/account/api-keys
     - OPENAI_API_TYPE: "azure"
     - AZURE_API_BASE
@@ -77,9 +78,11 @@ def main():
         debug_print(f"{key}={value}")
     debug_print()
 
-    if os.environ.get("OPENAI_API_KEY") is None and os.environ.get("GROQ_API_KEY") is None:
+    if (os.environ.get("OPENAI_API_KEY") is None
+            and os.environ.get("GROQ_API_KEY") is None
+            and os.environ.get("MISTRAL_API_KEY") is None):
         print(
-            "Please set either the OPENAI_API_KEY or GROQ_API_KEY environment variable."
+            "Please set either the OPENAI_API_KEY, MISTRAL_API_KEY or GROQ_API_KEY environment variable."
         )
         print(
             "You can also create `config.json` under `~/.config/shell-ai/` to set the API key, see README.md for more information."
@@ -107,6 +110,11 @@ def main():
     OLLAMA_MAX_TOKENS = os.environ.get("OLLAMA_MAX_TOKENS", loaded_config.get("OLLAMA_MAX_TOKENS",1500))
     OLLAMA_API_BASE = os.environ.get("OLLAMA_API_BASE",  loaded_config.get("OLLAMA_API_BASE","http://localhost:11434/v1/"))
     OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", None)
+    # Mistral configuration
+    MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
+    MISTRAL_MODEL = os.environ.get("MISTRAL_MODEL", loaded_config.get("MISTRAL_MODEL"))
+    MISTRAL_API_BASE = os.environ.get("MISTRAL_API_BASE", loaded_config.get("MISTRAL_API_BASE", "https://api.mistral.ai/v1"))
+
     OPENAI_ORGANIZATION = os.environ.get("OPENAI_ORGANIZATION", None)
     OPENAI_PROXY = os.environ.get("OPENAI_PROXY", None)
     SHAI_SUGGESTION_COUNT = int(os.environ.get("SHAI_SUGGESTION_COUNT", loaded_config.get("SHAI_SUGGESTION_COUNT", "3")))
@@ -140,6 +148,12 @@ def main():
     if SHAI_API_PROVIDER == "groq" and not GROQ_API_KEY:
         print(
             "Please set the GROQ_API_KEY environment variable to your Groq API key."
+        )
+        sys.exit(1)
+
+    if SHAI_API_PROVIDER == "mistral" and not MISTRAL_API_KEY:
+        print(
+            "Please set the MISTRAL_API_KEY environment variable to your Mistral API key."
         )
         sys.exit(1)
 
@@ -181,6 +195,13 @@ def main():
             temperature=SHAI_TEMPERATURE,
             api_key="ollama"
          )
+    elif SHAI_API_PROVIDER == "mistral":
+        chat = ChatMistralAI(
+            model_name=MISTRAL_MODEL,
+            api_key=MISTRAL_API_KEY,
+            base_url=MISTRAL_API_BASE,
+            temperature=SHAI_TEMPERATURE,
+        )
 
     if platform.system() == "Linux":
         info = platform.freedesktop_os_release()

@@ -5,3 +5,4 @@ InquirerPy~=0.3.0
 mistune~=3.0.0
 groq~=0.13.0
 langchain-groq~=0.2.0
+langchain-mistralai==0.2.11
