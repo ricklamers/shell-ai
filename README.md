@@ -78,7 +78,7 @@ Shell-AI can be configured through environment variables or a config file locate
    "SHAI_API_PROVIDER": "openai",
    "OPENAI_API_KEY": "deepseek_api_key",
    "OPENAI_API_BASE": "https://api.deepseek.com",
-   "OPENAI_MODEL": "deekseek-chat",
+   "OPENAI_MODEL": "deepseek-chat",
    "SHAI_SUGGESTION_COUNT": "3",
    "SHAI_SUGGESTION_COUNT": "3",
    "CTX": true
